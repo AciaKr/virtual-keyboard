@@ -128,9 +128,7 @@ const pressButtonOnKeyboard = () => {
         }
 
     addTextInTextarea(event);
-  },
-  false,
-  )
+  })
 
   document.body.addEventListener('keyup' , function(event){
         if(event.code !== 'CapsLock') {
@@ -171,4 +169,4 @@ document.addEventListener('click', (event) => {
       textarea.value = keyboard[code].activity(textarea.value, textarea.selectionStart);
     }
   }
-}, false);
+});
