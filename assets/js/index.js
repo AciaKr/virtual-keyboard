@@ -1,5 +1,6 @@
 /* eslint-disable linebreak-style */
 import symbols from './symbols.js';
+import keyboard from './key.js';
 
 class Key {
   constructor(classes, { code, en, ru }) {
@@ -33,7 +34,7 @@ class Key {
 
   createButton() {
     let content = '';
-    const button = document.createElement('div');
+    const button = document.createElement('button');
     button.classList.add('button', this.code);
 
     content += '<span class="en">';
@@ -41,6 +42,8 @@ class Key {
 
     if (this.en[1]) {
       content += `<span class="shiftCaps hidden">${this.en[1]}</span>`;
+    } else {
+      content += `<span class="shiftCaps hidden">${this.en[0]}</span>`;
     }
 
     content += '</span>';
@@ -89,3 +92,83 @@ const buildDOM = () => {
 };
 
 buildDOM();
+
+const switchCaps = () => {
+  const button = document.querySelectorAll('.caps');
+  for (let i = 0; i < button.length; i++) {
+    let parent = button[i].closest('.button');
+    if (parent.className.includes('Key')) {
+      button[i].classList.toggle('hidden');
+      button[i].nextSibling.classList.toggle('hidden');
+    }
+  }
+}
+
+const switchShift = () => {
+  const button = document.querySelectorAll('.caps');
+  for (let i = 0; i < button.length; i++) {
+      button[i].classList.toggle('hidden');
+      button[i].nextSibling.classList.toggle('hidden');
+  }
+}
+
+let onPressCapsLock = false;
+
+const pressButtonOnKeyboard = () => {
+  document.addEventListener('keydown', function(event) {
+    console.log(event);
+    document.querySelector(`.${event.code}`).classList.toggle('active');
+        if(event.code === 'CapsLock') {
+          switchCaps();
+          onPressCapsLock = onPressCapsLock ? false : true;
+        }
+
+        if(event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+          switchShift();
+        }
+
+    addTextInTextarea(event);
+  },
+  false,
+  )
+
+  document.body.addEventListener('keyup' , function(event){
+        if(event.code !== 'CapsLock') {
+          document.querySelector(`.${event.code}`).classList.toggle('active');
+        }
+
+        if(event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
+          switchShift();
+        }
+  })
+}
+
+const textarea = document.querySelector('.textarea');
+const addTextInTextarea = (event) => {
+  if (keyboard[event.code].dictionary) {
+    const register = event.shiftKey ? 1 : 0;
+    textarea.value += keyboard[event.code].dictionary.EN[register];
+  }
+}
+
+pressButtonOnKeyboard();
+
+document.addEventListener('click', (event) => {
+  if (event.target.closest(`.button`)) {
+    const code = event.target.closest(`.button`).classList[1];
+    console.log(onPressCapsLock);
+
+    if (code == 'CapsLock') {
+      onPressCapsLock = onPressCapsLock ? false : true;
+      document.querySelector(`.CapsLock`).classList.toggle('active');
+      switchCaps();
+    }
+    if (keyboard[code] && keyboard[code].dictionary) {
+      const register = onPressCapsLock ? 1 : 0;
+      textarea.value += keyboard[code].dictionary.EN[register];
+    }
+    if (keyboard[code] && keyboard[code].activity) {
+      textarea.value = keyboard[code].activity(textarea.value, textarea.selectionStart);
+    }
+  }
+}, false);

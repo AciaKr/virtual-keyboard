@@ -62,6 +62,7 @@
     color: #ffffff;
     background: #4b4b4b;
     border-radius: 3px;
+    border: none;
     cursor: pointer;
     user-select: none;
     transition: border-radius 0.3s, background-color 0.3s;
@@ -71,7 +72,8 @@
     background: #aa7979;
 }
 
-.keyboard .button.active {
+.keyboard .button.active,
+.keyboard .button:active {
     background-color: #aa7979;
     border-radius: 50px;
 }
