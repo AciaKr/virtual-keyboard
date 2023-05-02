@@ -5,8 +5,7 @@ import symbols from './symbols.js';
 import key from './key.js';
 
 class Key {
-  constructor(classes, { code, en, ru }) {
-    this.classes = classes;
+  constructor({ code, en, ru }) {
     this.code = code;
     this.en = en;
     this.ru = ru;
@@ -54,9 +53,9 @@ class Key {
   }
 }
 
-const createKeyboard = () => {
+const parseKey = () => {
   symbols.forEach((button) => {
-    const symbol = new Key('key', button);
+    const symbol = new Key(button);
     symbol.buildKeyboard();
   });
 };
@@ -89,77 +88,68 @@ const buildDOM = () => {
   const virtualKeyboard = document.querySelector('.body');
   virtualKeyboard.append(main);
 
-  createKeyboard();
-};
-
-buildDOM();
-
-const switchCaps = () => {
-  const button = document.querySelectorAll('.caps');
-  for (let i = 0; i < button.length; i += 1) {
-    const parent = button[i].closest('.button');
-    if (parent.className.includes('Key')) {
-      button[i].classList.toggle('hidden');
-      button[i].nextSibling.classList.toggle('hidden');
-    }
-  }
-};
-
-const switchShift = () => {
-  const button = document.querySelectorAll('.caps');
-  for (let i = 0; i < button.length; i += 1) {
-    button[i].classList.toggle('hidden');
-    button[i].nextSibling.classList.toggle('hidden');
-  }
-};
-
-const textarea = document.querySelector('.textarea');
-const addTextInTextarea = (event) => {
-  if (key[event.code].dictionary) {
-    const register = event.shiftKey ? 1 : 0;
-    textarea.value += key[event.code].dictionary.EN[register];
-  }
+  parseKey();
 };
 
 let onPressCapsLock = false;
 
-const pressButtonOnKeyboard = () => {
-  document.addEventListener('keydown', (event) => {
-    document.querySelector(`.${event.code}`).classList.toggle('active');
-    if (event.code === 'CapsLock') {
-      switchCaps();
-      onPressCapsLock = !onPressCapsLock;
+const switchCaps = (code) => {
+  if (code === 'CapsLock') {
+    document.querySelector(`.${code}`).classList.toggle('active');
+    onPressCapsLock = !onPressCapsLock;
+    const buttons = document.querySelectorAll('.caps');
+    for (let i = 0; i < buttons.length; i += 1) {
+      const parent = buttons[i].closest('.button');
+      if (parent.className.includes('Key')) {
+        buttons[i].classList.toggle('hidden');
+        buttons[i].nextSibling.classList.toggle('hidden');
+      }
     }
-
-    if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
-      switchShift();
-    }
-
-    addTextInTextarea(event);
-  });
-
-  document.body.addEventListener('keyup', (event) => {
-    if (event.code !== 'CapsLock') {
-      document.querySelector(`.${event.code}`).classList.toggle('active');
-    }
-
-    if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
-      switchShift();
-    }
-  });
+  }
 };
 
-pressButtonOnKeyboard();
+const switchShift = (code) => {
+  if (code === 'ShiftLeft' || code === 'ShiftRight') {
+    const buttons = document.querySelectorAll('.caps');
+    for (let i = 0; i < buttons.length; i += 1) {
+      buttons[i].classList.toggle('hidden');
+      buttons[i].nextSibling.classList.toggle('hidden');
+    }
+  }
+};
 
-document.addEventListener('click', (event) => {
+document.addEventListener('keydown', (event) => {
+  if (event.code !== 'CapsLock') {
+    document.querySelector(`.${event.code}`).classList.toggle('active');
+  }
+
+  switchCaps(event.code);
+
+  switchShift(event.code);
+
+  const textarea = document.querySelector('.textarea');
+  if (key[event.code].dictionary) {
+    const register = event.shiftKey ? 1 : 0;
+    textarea.value += key[event.code].dictionary.EN[register];
+  }
+});
+
+document.body.addEventListener('keyup', (event) => {
+  if (event.code !== 'CapsLock') {
+    document.querySelector(`.${event.code}`).classList.toggle('active');
+  }
+  switchShift(event.code);
+});
+
+document.addEventListener('mousedown', (event) => {
+  const textarea = document.querySelector('.textarea');
   if (event.target.closest('.button')) {
     const code = event.target.closest('.button').classList[1];
 
-    if (code === 'CapsLock') {
-      onPressCapsLock = !onPressCapsLock;
-      document.querySelector('.CapsLock').classList.toggle('active');
-      switchCaps();
-    }
+    switchCaps(code);
+
+    switchShift(code);
+
     if (key[code] && key[code].dictionary) {
       const register = onPressCapsLock ? 1 : 0;
       textarea.value += key[code].dictionary.EN[register];
@@ -169,3 +159,14 @@ document.addEventListener('click', (event) => {
     }
   }
 });
+
+document.addEventListener('mouseup', (event) => {
+  if (event.target.closest('.button')) {
+    const code = event.target.closest('.button').classList[1];
+    switchShift(code);
+  }
+});
+
+window.onload = () => {
+  buildDOM();
+};

@@ -70,12 +70,14 @@
 
 .keyboard .button:hover {
     background: #aa7979;
+    border: none;
 }
 
 .keyboard .button.active,
 .keyboard .button:active {
     background-color: #aa7979;
     border-radius: 50px;
+    border: none;
 }
 
 .keyboard .AltLeft,.keyboard .AltRight,.keyboard .ArrowUp,.keyboard .ArrowLeft,.keyboard .ArrowDown,.keyboard .ArrowRight,.keyboard .Backspace,.keyboard .CapsLock,.keyboard .ControlLeft,.keyboard .ControlRight,.keyboard .Delete,.keyboard .Enter,.keyboard .ShiftLeft,.keyboard .ShiftRight,.keyboard .Tab,.keyboard .MetaLeft {
