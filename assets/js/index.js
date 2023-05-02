@@ -5,8 +5,7 @@ import symbols from './symbols.js';
 import key from './key.js';
 
 class Key {
-  constructor(classes, { code, en, ru }) {
-    this.classes = classes;
+  constructor({ code, en, ru }) {
     this.code = code;
     this.en = en;
     this.ru = ru;
@@ -54,9 +53,9 @@ class Key {
   }
 }
 
-const createKeyboard = () => {
+const parseKey = () => {
   symbols.forEach((button) => {
-    const symbol = new Key('key', button);
+    const symbol = new Key(button);
     symbol.buildKeyboard();
   });
 };
@@ -89,10 +88,8 @@ const buildDOM = () => {
   const virtualKeyboard = document.querySelector('.body');
   virtualKeyboard.append(main);
 
-  createKeyboard();
+  parseKey();
 };
-
-buildDOM();
 
 let onPressCapsLock = false;
 
@@ -121,39 +118,31 @@ const switchShift = (code) => {
   }
 };
 
-const textarea = document.querySelector('.textarea');
-const addTextInTextarea = (event) => {
+document.addEventListener('keydown', (event) => {
+  if (event.code !== 'CapsLock') {
+    document.querySelector(`.${event.code}`).classList.toggle('active');
+  }
+
+  switchCaps(event.code);
+
+  switchShift(event.code);
+
+  const textarea = document.querySelector('.textarea');
   if (key[event.code].dictionary) {
     const register = event.shiftKey ? 1 : 0;
     textarea.value += key[event.code].dictionary.EN[register];
   }
-};
+});
 
-const pressButtonOnKeyboard = () => {
-  document.addEventListener('keydown', (event) => {
-    if (event.code !== 'CapsLock') {
-      document.querySelector(`.${event.code}`).classList.toggle('active');
-    }
-
-    switchCaps(event.code);
-
-    switchShift(event.code);
-
-    addTextInTextarea(event);
-  });
-
-  document.body.addEventListener('keyup', (event) => {
-    if (event.code !== 'CapsLock') {
-      document.querySelector(`.${event.code}`).classList.toggle('active');
-    }
-
-    switchShift(event.code);
-  });
-};
-
-pressButtonOnKeyboard();
+document.body.addEventListener('keyup', (event) => {
+  if (event.code !== 'CapsLock') {
+    document.querySelector(`.${event.code}`).classList.toggle('active');
+  }
+  switchShift(event.code);
+});
 
 document.addEventListener('mousedown', (event) => {
+  const textarea = document.querySelector('.textarea');
   if (event.target.closest('.button')) {
     const code = event.target.closest('.button').classList[1];
 
@@ -172,6 +161,12 @@ document.addEventListener('mousedown', (event) => {
 });
 
 document.addEventListener('mouseup', (event) => {
-  const code = event.target.closest('.button').classList[1];
-  switchShift(code);
+  if (event.target.closest('.button')) {
+    const code = event.target.closest('.button').classList[1];
+    switchShift(code);
+  }
 });
+
+window.onload = () => {
+  buildDOM();
+};
