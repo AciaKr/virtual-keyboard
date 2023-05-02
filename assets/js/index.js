@@ -94,22 +94,30 @@ const buildDOM = () => {
 
 buildDOM();
 
-const switchCaps = () => {
-  const button = document.querySelectorAll('.caps');
-  for (let i = 0; i < button.length; i += 1) {
-    const parent = button[i].closest('.button');
-    if (parent.className.includes('Key')) {
-      button[i].classList.toggle('hidden');
-      button[i].nextSibling.classList.toggle('hidden');
+let onPressCapsLock = false;
+
+const switchCaps = (code) => {
+  if (code === 'CapsLock') {
+    document.querySelector(`.${code}`).classList.toggle('active');
+    onPressCapsLock = !onPressCapsLock;
+    const buttons = document.querySelectorAll('.caps');
+    for (let i = 0; i < buttons.length; i += 1) {
+      const parent = buttons[i].closest('.button');
+      if (parent.className.includes('Key')) {
+        buttons[i].classList.toggle('hidden');
+        buttons[i].nextSibling.classList.toggle('hidden');
+      }
     }
   }
 };
 
-const switchShift = () => {
-  const button = document.querySelectorAll('.caps');
-  for (let i = 0; i < button.length; i += 1) {
-    button[i].classList.toggle('hidden');
-    button[i].nextSibling.classList.toggle('hidden');
+const switchShift = (code) => {
+  if (code === 'ShiftLeft' || code === 'ShiftRight') {
+    const buttons = document.querySelectorAll('.caps');
+    for (let i = 0; i < buttons.length; i += 1) {
+      buttons[i].classList.toggle('hidden');
+      buttons[i].nextSibling.classList.toggle('hidden');
+    }
   }
 };
 
@@ -121,19 +129,15 @@ const addTextInTextarea = (event) => {
   }
 };
 
-let onPressCapsLock = false;
-
 const pressButtonOnKeyboard = () => {
   document.addEventListener('keydown', (event) => {
-    document.querySelector(`.${event.code}`).classList.toggle('active');
-    if (event.code === 'CapsLock') {
-      switchCaps();
-      onPressCapsLock = !onPressCapsLock;
+    if (event.code !== 'CapsLock') {
+      document.querySelector(`.${event.code}`).classList.toggle('active');
     }
 
-    if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
-      switchShift();
-    }
+    switchCaps(event.code);
+
+    switchShift(event.code);
 
     addTextInTextarea(event);
   });
@@ -143,23 +147,20 @@ const pressButtonOnKeyboard = () => {
       document.querySelector(`.${event.code}`).classList.toggle('active');
     }
 
-    if (event.code === 'ShiftLeft' || event.code === 'ShiftRight') {
-      switchShift();
-    }
+    switchShift(event.code);
   });
 };
 
 pressButtonOnKeyboard();
 
-document.addEventListener('click', (event) => {
+document.addEventListener('mousedown', (event) => {
   if (event.target.closest('.button')) {
     const code = event.target.closest('.button').classList[1];
 
-    if (code === 'CapsLock') {
-      onPressCapsLock = !onPressCapsLock;
-      document.querySelector('.CapsLock').classList.toggle('active');
-      switchCaps();
-    }
+    switchCaps(code);
+
+    switchShift(code);
+
     if (key[code] && key[code].dictionary) {
       const register = onPressCapsLock ? 1 : 0;
       textarea.value += key[code].dictionary.EN[register];
@@ -168,4 +169,9 @@ document.addEventListener('click', (event) => {
       textarea.value = key[code].activity(textarea.value, textarea.selectionStart);
     }
   }
+});
+
+document.addEventListener('mouseup', (event) => {
+  const code = event.target.closest('.button').classList[1];
+  switchShift(code);
 });
