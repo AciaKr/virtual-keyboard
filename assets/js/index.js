@@ -1,6 +1,3 @@
-/* eslint-disable linebreak-style */
-/* eslint-disable import/extensions */
-
 import symbols from './symbols.js';
 import key from './key.js';
 
@@ -119,18 +116,42 @@ const switchShift = (code) => {
 };
 
 document.addEventListener('keydown', (event) => {
+  event.preventDefault();
+  const textarea = document.querySelector('.textarea');
+  textarea.focus();
   if (event.code !== 'CapsLock') {
     document.querySelector(`.${event.code}`).classList.toggle('active');
+  }
+
+  if (event.ctrlKey && event.code === 'KeyC') {
+    return;
   }
 
   switchCaps(event.code);
 
   switchShift(event.code);
 
-  const textarea = document.querySelector('.textarea');
-  if (key[event.code].dictionary) {
-    const register = event.shiftKey ? 1 : 0;
-    textarea.value += key[event.code].dictionary.EN[register];
+  if (key[event.code] && key[event.code].activity) {
+    textarea.value = key[event.code].activity(textarea.value, textarea.selectionStart);
+    textarea.focus();
+  }
+
+  if (key[event.code] && key[event.code].dictionary) {
+    if (onPressCapsLock) {
+      const letters = symbols.filter((item) => item.code.includes('Key'));
+      if (letters.find((item) => item.code === event.code)) {
+        const register = event.shiftKey ? 0 : 1;
+        textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
+      } else {
+        const register = event.shiftKey ? 1 : 0;
+        textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
+        textarea.focus();
+      }
+    } else {
+      const register = event.shiftKey ? 1 : 0;
+      textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
+      textarea.focus();
+    }
   }
 });
 
@@ -143,8 +164,13 @@ document.body.addEventListener('keyup', (event) => {
 
 document.addEventListener('mousedown', (event) => {
   const textarea = document.querySelector('.textarea');
+  textarea.focus();
   if (event.target.closest('.button')) {
     const code = event.target.closest('.button').classList[1];
+
+    if (event.ctrlKey && event.code === 'KeyC') {
+      return;
+    }
 
     switchCaps(code);
 
@@ -152,10 +178,13 @@ document.addEventListener('mousedown', (event) => {
 
     if (key[code] && key[code].dictionary) {
       const register = onPressCapsLock ? 1 : 0;
-      textarea.value += key[code].dictionary.EN[register];
+      textarea.setRangeText(key[code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
+      textarea.focus();
     }
+
     if (key[code] && key[code].activity) {
       textarea.value = key[code].activity(textarea.value, textarea.selectionStart);
+      textarea.focus();
     }
   }
 });
