@@ -119,38 +119,42 @@ document.addEventListener('keydown', (event) => {
   event.preventDefault();
   const textarea = document.querySelector('.textarea');
   textarea.focus();
-  if (event.code !== 'CapsLock') {
-    document.querySelector(`.${event.code}`).classList.toggle('active');
-  }
-
-  if (event.ctrlKey && event.code === 'KeyC') {
-    return;
-  }
-
-  switchCaps(event.code);
-
-  switchShift(event.code);
-
-  if (key[event.code] && key[event.code].activity) {
-    textarea.value = key[event.code].activity(textarea.value, textarea.selectionStart);
-    textarea.focus();
-  }
-
-  if (key[event.code] && key[event.code].dictionary) {
-    let register = event.shiftKey ? 1 : 0;
-    if (onPressCapsLock && event.code.includes('Key')) {
-      register = event.shiftKey ? 0 : 1;
+  if (key[event.code]) {
+    if (event.code !== 'CapsLock') {
+      document.querySelector(`.${event.code}`).classList.toggle('active');
     }
-    textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
-    textarea.focus();
+
+    if (event.ctrlKey && event.code === 'KeyC') {
+      return;
+    }
+
+    switchCaps(event.code);
+
+    switchShift(event.code);
+
+    if (key[event.code] && key[event.code].activity) {
+      textarea.value = key[event.code].activity(textarea.value, textarea.selectionStart);
+      textarea.focus();
+    }
+
+    if (key[event.code] && key[event.code].dictionary) {
+      let register = event.shiftKey ? 1 : 0;
+      if (onPressCapsLock && event.code.includes('Key')) {
+        register = event.shiftKey ? 0 : 1;
+      }
+      textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
+      textarea.focus();
+    }
   }
 });
 
 document.body.addEventListener('keyup', (event) => {
-  if (event.code !== 'CapsLock') {
-    document.querySelector(`.${event.code}`).classList.toggle('active');
+  if (key[event.code]) {
+    if (event.code !== 'CapsLock') {
+      document.querySelector(`.${event.code}`).classList.toggle('active');
+    }
+    switchShift(event.code);
   }
-  switchShift(event.code);
 });
 
 document.addEventListener('mousedown', (event) => {
