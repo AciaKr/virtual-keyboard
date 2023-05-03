@@ -137,21 +137,12 @@ document.addEventListener('keydown', (event) => {
   }
 
   if (key[event.code] && key[event.code].dictionary) {
-    if (onPressCapsLock) {
-      const letters = symbols.filter((item) => item.code.includes('Key'));
-      if (letters.find((item) => item.code === event.code)) {
-        const register = event.shiftKey ? 0 : 1;
-        textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
-      } else {
-        const register = event.shiftKey ? 1 : 0;
-        textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
-        textarea.focus();
-      }
-    } else {
-      const register = event.shiftKey ? 1 : 0;
-      textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
-      textarea.focus();
+    let register = event.shiftKey ? 1 : 0;
+    if (onPressCapsLock && event.code.includes('Key')) {
+      register = event.shiftKey ? 0 : 1;
     }
+    textarea.setRangeText(key[event.code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
+    textarea.focus();
   }
 });
 
@@ -163,6 +154,7 @@ document.body.addEventListener('keyup', (event) => {
 });
 
 document.addEventListener('mousedown', (event) => {
+  event.preventDefault();
   const textarea = document.querySelector('.textarea');
   textarea.focus();
   if (event.target.closest('.button')) {
@@ -177,7 +169,10 @@ document.addEventListener('mousedown', (event) => {
     switchShift(code);
 
     if (key[code] && key[code].dictionary) {
-      const register = onPressCapsLock ? 1 : 0;
+      let register = onPressCapsLock ? 1 : 0;
+      if (onPressCapsLock && !code.includes('Key')) {
+        register = onPressCapsLock ? 0 : 1;
+      }
       textarea.setRangeText(key[code].dictionary.EN[register], textarea.selectionStart, textarea.selectionEnd, 'end');
       textarea.focus();
     }
