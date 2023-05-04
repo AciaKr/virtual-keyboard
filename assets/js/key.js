@@ -313,11 +313,11 @@ const keyboard = {
   },
   ShiftRight: {
     name: '&uarr;',
-    // activity: (value, curretPos) => value.slice(0, curretPos) + value.slice(curretPos + 1),
+    activity: (value, curretPos) => value.slice(0, curretPos) + value.slice(curretPos + 1),
   },
   ArrowUp: {
     name: '&and;',
-    activity: (value, curretPos) => value.slice(0, curretPos) + value.slice(curretPos + 1),
+    activity: (value, curretPos) => `${value.slice(0, curretPos)}\u2B9D${value.slice(curretPos + 1)}`,
   },
   ControlLeft: {
     name: 'Ctrl',
@@ -344,15 +344,15 @@ const keyboard = {
   },
   ArrowLeft: {
     name: '<',
-    activity: (value, curretPos) => value.slice(0, curretPos) + value.slice(curretPos + 1),
+    activity: (value, curretPos) => `${value.slice(0, curretPos)}\u2B9C${value.slice(curretPos + 1)}`,
   },
   ArrowDown: {
     name: '&or;',
-    activity: (value, curretPos) => `${value.slice(0, curretPos)}&or;${value.slice(curretPos + 1)}`,
+    activity: (value, curretPos) => `${value.slice(0, curretPos)}\u2B9F${value.slice(curretPos + 1)}`,
   },
   ArrowRight: {
     name: '>',
-    activity: (value, curretPos) => value.slice(0, curretPos) + value.slice(curretPos + 1),
+    activity: (value, curretPos) => `${value.slice(0, curretPos)}\u2B9E${value.slice(curretPos + 1)}`,
   },
 };
 
