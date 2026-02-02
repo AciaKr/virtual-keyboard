@@ -75,7 +75,7 @@ const buildDOM = () => {
 
   const description = document.createElement('div');
   description.classList.add('description');
-  description.innerHTML = 'Клавиатура создана в операционной системе Windows<br>Для переключения языка комбинация: левыe ctrl + alt';
+  description.innerHTML = 'Клавиатура создана в операционной системе Windows';
 
   main.append(title);
   main.append(textarea);
